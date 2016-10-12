@@ -21,27 +21,37 @@ public class MyGdxGame extends ApplicationAdapter {
 
     SpriteBatch batch;
     Texture textureRun[] = new Texture[14];
-    Texture textureStand[] = new Texture[6];
-    Texture textureJump[] = new Texture[4];
+    Texture textureStand[] = new Texture[4];
+    Texture textureJump[] = new Texture[19];
     TextureRegion texRegion;
     Vector2 v1;
     Sprite spr1;
     int nTimer = 0, nAnim1 = 0, nAnim2 = 0, nAnim3 = 0;
     int nDir = 1;
-    int nCounter1 = 0, nCounter2 = 0;
+    int nRunBuffer = 0, nRunIndex = 0;
+    int nStandBuffer = 0, nStandIndex = 0;
+    int nJumpBuffer = 0, nJumpIndex = 0;
+    int nJumpH = 0;
+    int nDoubleJump = 0;
+    int nCounter = 0;
     Timer time;
+    double dGrav = 8;
     boolean bLR;
+    boolean isJumpUp = false, isJumpDown = false;
 
     @Override
     public void create() {
         for (int i = 0; i < 14; i++) {
             textureRun[i] = new Texture(Gdx.files.absolute("D:/Chester/core/assets/run/" + i + ".png"));
-
         }
         for (int i = 0; i < 4; i++) {
+            textureStand[i] = new Texture(Gdx.files.absolute("D:/Chester/core/assets/standing/" + i + ".png"));
+        }
+        for (int i = 0; i < 19; i++) {
+            textureJump[i] = new Texture(Gdx.files.absolute("D:/Chester/core/assets/jump/" + i + ".png"));
         }
         batch = new SpriteBatch();
-        v1 = new Vector2(200, 200);
+        v1 = new Vector2(100, 0);
     }
 
     @Override
@@ -49,36 +59,96 @@ public class MyGdxGame extends ApplicationAdapter {
         Gdx.gl.glClearColor(100, 100, 100, 20);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        nCounter1++;
-        if (nCounter1 == 5) {
-            nCounter2++;
-            nCounter1 = 0;
+        nRunBuffer++;
+        nJumpBuffer++;
+        nStandBuffer++;
+        if (nRunBuffer == 5) {
+            nRunIndex++;
+            nRunBuffer = 0;
         }
-        if (nCounter2 == 6) {
-            nCounter2 = 0;
+        if (nRunIndex == 6) {
+            nRunIndex = 0;
         }
-        texRegion = new TextureRegion(textureRun[nCounter2]);
-        texRegion.flip(bLR, false);
-//        spr1.setRegion(texRegion);
+        if (nStandBuffer == 15) {
+            nStandIndex++;
+            nStandBuffer = 0;
+        }
+        if (nStandIndex == 4) {
+            nStandIndex = 0;
+        }
+        if (nJumpBuffer == 3) {
+            nJumpIndex++;
+            nJumpBuffer = 0;
+        }
+        if (nJumpIndex == 19) {
+            nJumpIndex = 0;
+        }
         nDir = whichAnim();
+        if (nDir == 0) {
+            texRegion = new TextureRegion(textureStand[nStandIndex]);
+        } else if (nDir == 1) {
+            texRegion = new TextureRegion(textureRun[nRunIndex]);
+        } else if (nDir == 2) {
+            texRegion = new TextureRegion(textureRun[nRunIndex]);
+        }
+        if (isJumpUp || isJumpDown) {
+            texRegion = new TextureRegion(textureJump[nJumpIndex]);
+        }
+        if (!isJumpUp && !isJumpDown) {
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                dGrav = 6;
+                nJumpIndex = 0;
+                isJumpUp = true;
+            }
+        }
+        nCounter++;
+        if (nCounter % 2 == 0) {
+            dGrav -= 0.5;
+        }
+        if (v1.y < 0) {
+            v1.y = 0;
+            dGrav = 0;
+            isJumpUp = false;
+            isJumpDown = false;
+        }
+        if (isJumpUp) {
+            if (v1.y < 100) {
+                v1.y += dGrav;
+            } else {
+                isJumpDown = true;
+                isJumpUp = false;
+            }
+        }
+        if (isJumpDown) {
+            if (v1.y > 0) {
+                v1.y -= dGrav;
+                System.out.println("down");
+            } else if (v1.y <= 0) {
+                dGrav = 0;
+                v1.y = 0;
+                isJumpUp = false;
+                isJumpDown = false;
+            }
+        }
+        texRegion.flip(bLR, false);
         batch.draw(texRegion, v1.x, v1.y);
-        v1.x+=3;
         batch.end();
+
     }
 
     public int whichAnim() {
         if (Gdx.input.isKeyPressed(Keys.DPAD_LEFT)) {
             bLR = true;
-            return 0;
-        } else if (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT)) {
-            bLR = false;
+            v1.x -= 3;
             return 1;
-        } else if (Gdx.input.isKeyPressed(Keys.DPAD_UP)) {
-            return 3;
-        } else {
-            return 2;
         }
+        if (Gdx.input.isKeyPressed(Keys.DPAD_RIGHT)) {
+            bLR = false;
+            v1.x += 3;
+            return 2;
+        } else {
+            return 0;
 
-
+        }
     }
 }
