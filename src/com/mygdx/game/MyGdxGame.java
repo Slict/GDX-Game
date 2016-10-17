@@ -64,29 +64,8 @@ public class MyGdxGame extends ApplicationAdapter {
         Gdx.gl.glClearColor(100, 100, 100, 20);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-
-        if (nRunBuffer == 4) {
-            nRunIndex++;
-            nRunBuffer = 0;
-        }
-        if (nRunIndex == 6) {
-            nRunIndex = 0;
-        }
-        if (nStandBuffer == 15) {
-            nStandIndex++;
-            nStandBuffer = 0;
-        }
-        if (nStandIndex == 4) {
-            nStandIndex = 0;
-        }
-        if (nJumpBuffer == 3) {
-            nJumpIndex++;
-            nJumpBuffer = 0;
-        }
-        if (nJumpIndex == 19) {
-            nJumpIndex = 0;
-        }
         texRegion = move.drawMove(v1, nRunIndex, nJumpIndex, nStandIndex);
+
 //        nRunBuffer++;
 //        nJumpBuffer++;
 //        nStandBuffer++;

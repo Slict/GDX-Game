@@ -29,6 +29,7 @@ public class Movement {
     double dGrav = 8;
 
     public Movement() {
+
         for (int i = 0; i < 14; i++) {
             textureRun[i] = new Texture(Gdx.files.absolute("D:/Chester/core/assets/run/" + i + ".png"));
         }
@@ -41,7 +42,29 @@ public class Movement {
     }
 
     public TextureRegion drawMove(Vector2 _v1, int nRunIndex, int nJumpIndex, int nStandIndex) {
-       nDir = whichAnim(_v1);
+
+        if (nRunBuffer == 4) {
+            nRunIndex++;
+            nRunBuffer = 0;
+        }
+        if (nRunIndex == 6) {
+            nRunIndex = 0;
+        }
+        if (nStandBuffer == 15) {
+            nStandIndex++;
+            nStandBuffer = 0;
+        }
+        if (nStandIndex == 4) {
+            nStandIndex = 0;
+        }
+        if (nJumpBuffer == 3) {
+            nJumpIndex++;
+            nJumpBuffer = 0;
+        }
+        if (nJumpIndex == 19) {
+            nJumpIndex = 0;
+        }
+        nDir = whichAnim(_v1);
         if (nDir == 1) {
             _v1.x -= 3;
             texRegion = new TextureRegion(textureRun[nRunIndex]);
